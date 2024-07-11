@@ -4,17 +4,6 @@
     <button @click="startAction">开始</button>
     <button @click="stopAction">结束</button>
   </div>
-  <!-- 在屏幕中间添加一个标题，显示当前点的经纬度坐标 -->
-  <div>
-    <Flip>
-      <template #front>
-        <p>前面内容</p>
-      </template>
-      <template #back>
-        <p>背面内容</p>
-      </template>
-    </Flip>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +11,6 @@ import * as Cesium from 'cesium'
 import { Viewer } from 'cesium'
 import 'cesium/Build/Cesium/Widgets/widgets.css'
 import { onMounted, onUnmounted } from 'vue'
-import Flip from './Flip.vue'
 
 let viewer: Viewer
 onMounted(() => {
