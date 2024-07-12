@@ -10,10 +10,11 @@
 import * as Cesium from 'cesium'
 import { Viewer } from 'cesium'
 import 'cesium/Build/Cesium/Widgets/widgets.css'
+import MVTImageryProvider from 'mvt-imagery-provider'
 import { onMounted, onUnmounted } from 'vue'
 
 let viewer: Viewer
-onMounted(() => {
+onMounted(async () => {
   viewer = new Viewer('viewerContainer', {
     animation: false, // 是否创建动画小器件，左下角仪表
     baseLayerPicker: false, // 是否显示图层选择器
@@ -30,49 +31,66 @@ onMounted(() => {
   })
   viewer.cesiumWidget.creditContainer.style.display = 'none'
 
-  const start = Cesium.JulianDate.fromDate(new Date(2023, 6, 4, 10, 0, 0))
-  const stop = Cesium.JulianDate.addSeconds(start, 360, new Cesium.JulianDate())
-
-  viewer.clock.startTime = start.clone()
-  viewer.clock.stopTime = stop.clone()
-  viewer.clock.currentTime = start.clone()
-  viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP
-  viewer.clock.multiplier = 10
-
-  const position = new Cesium.SampledPositionProperty()
-
-  const positions = [
-    Cesium.Cartesian3.fromDegrees(-75.1, 39.57, 100),
-    Cesium.Cartesian3.fromDegrees(-75.2, 39.57, 100),
-    Cesium.Cartesian3.fromDegrees(-75.3, 39.57, 100),
-  ]
-
-  const times = [
-    Cesium.JulianDate.addSeconds(start, 0, new Cesium.JulianDate()),
-    Cesium.JulianDate.addSeconds(start, 120, new Cesium.JulianDate()),
-    Cesium.JulianDate.addSeconds(start, 240, new Cesium.JulianDate()),
-  ]
-
-  position.addSamples(times, positions)
-  console.log(position, 'position')
-
-  const entity = viewer.entities.add({
-    position: position,
-    point: {
-      pixelSize: 10,
-      color: Cesium.Color.RED,
-    },
-    // viewFrom: new Cesium.Cartesian3(-100, 100, 100),
+  // 加载mvt数据
+  const provider = await MVTImageryProvider.fromUrl('./style/style.json', {
+    accessToken: 'pk.eyJ1IjoibWluZ2xlLTIwMjMiLCJhIjoiY2xmcm44M3B0MDdoNjN3cXRoZXV1N2FveSJ9.NDA3K4LcsCQ2Ff6zQzYgdg',
   })
-  viewer.trackedEntity = entity
 
-  position.setInterpolationOptions({
-    interpolationDegree: 5,
-    interpolationAlgorithm: Cesium.LagrangePolynomialApproximation,
-  })
-  // 定位到第一个点
+  viewer.scene.imageryLayers.addImageryProvider(provider)
+  console.log(provider, 'provider=>')
+
+  // const start = Cesium.JulianDate.fromDate(new Date(2023, 6, 4, 10, 0, 0))
+  // const stop = Cesium.JulianDate.addSeconds(start, 360, new Cesium.JulianDate())
+
+  // viewer.clock.startTime = start.clone()
+  // viewer.clock.stopTime = stop.clone()
+  // viewer.clock.currentTime = start.clone()
+  // viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP
+  // viewer.clock.multiplier = 10
+
+  // const position = new Cesium.SampledPositionProperty()
+
+  // const positions = [
+  //   Cesium.Cartesian3.fromDegrees(-75.1, 39.57, 100),
+  //   Cesium.Cartesian3.fromDegrees(-75.2, 39.57, 100),
+  //   Cesium.Cartesian3.fromDegrees(-75.3, 39.57, 100),
+  // ]
+
+  // const times = [
+  //   Cesium.JulianDate.addSeconds(start, 0, new Cesium.JulianDate()),
+  //   Cesium.JulianDate.addSeconds(start, 120, new Cesium.JulianDate()),
+  //   Cesium.JulianDate.addSeconds(start, 240, new Cesium.JulianDate()),
+  // ]
+
+  // position.addSamples(times, positions)
+  // console.log(position, 'position')
+
+  // const entity = viewer.entities.add({
+  //   position: position,
+  //   point: {
+  //     pixelSize: 10,
+  //     color: Cesium.Color.RED,
+  //   },
+  //   // viewFrom: new Cesium.Cartesian3(-100, 100, 100),
+  // })
+  // viewer.trackedEntity = entity
+
+  // position.setInterpolationOptions({
+  //   interpolationDegree: 5,
+  //   interpolationAlgorithm: Cesium.LagrangePolynomialApproximation,
+  // })
+  // // 定位到第一个点
+  // viewer.camera.flyTo({
+  //   destination: positions[0],
+  //   orientation: {
+  //     heading: Cesium.Math.toRadians(0),
+  //     pitch: Cesium.Math.toRadians(-30),
+  //     roll: Cesium.Math.toRadians(0),
+  //   },
+  // })
+  // 定位到 114，23.53
   viewer.camera.flyTo({
-    destination: positions[0],
+    destination: Cesium.Cartesian3.fromDegrees(114, 23.53, 5000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-30),
